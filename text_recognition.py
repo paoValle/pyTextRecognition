@@ -80,7 +80,7 @@ ap.add_argument("-w", "--width", type=int, default=320,
   help="nearest multiple of 32 for resized width")
 ap.add_argument("-e", "--height", type=int, default=320,
   help="nearest multiple of 32 for resized height")
-ap.add_argument("-p", "--padding", type=float, default=0.2,
+ap.add_argument("-p", "--padding", type=float, default=0.25,
   help="amount of padding to add to each border of ROI")
 args = vars(ap.parse_args())
 
@@ -97,12 +97,14 @@ print("[INFO] loading EAST text detector...")
 net = cv2.dnn.readNet(args["east"])
 
 #video oject video (with id of camera)
-video = cv2.VideoCapture(1)
+video = cv2.VideoCapture('http://192.168.1.107:4747/video')
 
 while True:
   # load the input image and grab the image dimensions
   #frame object
   check, image = video.read()
+  #thresholding
+  ret, image = cv2.threshold(image,127,255,cv2.THRESH_TOZERO)
 
   #image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
   #show the frame
