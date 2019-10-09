@@ -76,11 +76,11 @@ ap.add_argument("-east", "--east", type=str, default="frozen_east_text_detection
   help="path to input EAST text detector")
 ap.add_argument("-c", "--min-confidence", type=float, default=0.95,
   help="minimum probability required to inspect a region")
-ap.add_argument("-w", "--width", type=int, default=320,
+ap.add_argument("-w", "--width", type=int, default=640,
   help="nearest multiple of 32 for resized width")
-ap.add_argument("-e", "--height", type=int, default=320,
+ap.add_argument("-e", "--height", type=int, default=640,
   help="nearest multiple of 32 for resized height")
-ap.add_argument("-p", "--padding", type=float, default=0.25,
+ap.add_argument("-p", "--padding", type=float, default=0.02,
   help="amount of padding to add to each border of ROI")
 args = vars(ap.parse_args())
 
@@ -97,14 +97,24 @@ print("[INFO] loading EAST text detector...")
 net = cv2.dnn.readNet(args["east"])
 
 #video oject video (with id of camera)
-video = cv2.VideoCapture('http://192.168.1.107:4747/video')
+video = cv2.VideoCapture(1)
 
 while True:
   # load the input image and grab the image dimensions
   #frame object
   check, image = video.read()
   #thresholding
-  ret, image = cv2.threshold(image,127,255,cv2.THRESH_TOZERO)
+  #ret, image = cv2.threshold(image,127,255,cv2.THRESH_TOZERO)
+  # Threshold to obtain binary image
+  thresh = cv2.threshold(image, 220, 255, cv2.THRESH_BINARY)[1]
+
+  # Create custom kernel
+  kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+  # Perform closing (dilation followed by erosion)
+  close = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+
+  # Invert image to use for Tesseract
+  image = 255 - close
 
   #image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
   #show the frame
@@ -168,7 +178,7 @@ while True:
     # wish to use the LSTM neural net model for OCR, and finally
     # (3) an OEM value, in this case, 7 which implies that we are
     # treating the ROI as a single line of text
-    config = ("-l eng --oem 1 --psm 7")
+    config = ("-l eng --oem 1 --psm 9")
     text = pytesseract.image_to_string(roi, config=config)
 
     # add the bounding box coordinates and OCR'd text to the list

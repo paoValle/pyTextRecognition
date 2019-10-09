@@ -1,28 +1,37 @@
-import cv2, time
+import cv2
+import time
 
-#video oject video (with id of camera)
+# video oject video (with id of camera)
 video = cv2.VideoCapture(1)
-a=0
+a = 0
 while True:
 
-  a=a+1
-  #frame object
+  a = a+1
+  # frame object
   check, frame = video.read()
 
-  print(check)
-  print(frame) #image
+  # Threshold to obtain binary image
+  thresh = cv2.threshold(frame, 220, 255, cv2.THRESH_BINARY_INV)[1]
 
-  #show the frame
-  cv2.imshow("Capturing", frame)
+  # Create custom kernel
+  kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+  # Perform closing (dilation followed by erosion)
+  close = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
 
-  #press any key to out
-  key=cv2.waitKey(1)
+  # Invert image to use for Tesseract
+  result = 255 - close
 
-  if key==ord('q'):
-    break;
+  # show the frame
+  cv2.imshow("Capturing", result)
+
+  # press any key to out
+  key = cv2.waitKey(1)
+
+  if key == ord('q'):
+      break
 
 print(a)
-#shutdown the camera
+# shutdown the camera
 video.release()
 
 cv2.destroyAllWindows()
