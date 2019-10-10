@@ -2,7 +2,7 @@ import cv2
 import time
 
 # video oject video (with id of camera)
-video = cv2.VideoCapture(1)
+video = cv2.VideoCapture('http://192.168.1.107:5050/video')
 a = 0
 while True:
 
