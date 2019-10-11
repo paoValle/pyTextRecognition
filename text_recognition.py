@@ -76,11 +76,11 @@ ap.add_argument("-east", "--east", type=str, default="frozen_east_text_detection
   help="path to input EAST text detector")
 ap.add_argument("-c", "--min-confidence", type=float, default=0.95,
   help="minimum probability required to inspect a region")
-ap.add_argument("-w", "--width", type=int, default=160,
+ap.add_argument("-w", "--width", type=int, default=320,
   help="nearest multiple of 32 for resized width")
-ap.add_argument("-e", "--height", type=int, default=160,
+ap.add_argument("-e", "--height", type=int, default=320,
   help="nearest multiple of 32 for resized height")
-ap.add_argument("-p", "--padding", type=float, default=0.02,
+ap.add_argument("-p", "--padding", type=float, default=0.05,
   help="amount of padding to add to each border of ROI")
 args = vars(ap.parse_args())
 
@@ -97,24 +97,25 @@ print("[INFO] loading EAST text detector...")
 net = cv2.dnn.readNet(args["east"])
 
 #video oject video (with id of camera)
-video = cv2.VideoCapture('http://192.168.1.107:5050/video')
+video = cv2.VideoCapture(0)
 
 while True:
   # load the input image and grab the image dimensions
   #frame object
   check, image = video.read()
+  cv2.imshow("Original", image)
   #thresholding
   #ret, image = cv2.threshold(image,127,255,cv2.THRESH_TOZERO)
-  # Threshold to obtain binary image
-  thresh = cv2.threshold(image, 220, 255, cv2.THRESH_BINARY_INV)[1]
+  # # Threshold to obtain binary image
+  # thresh = cv2.threshold(image, 220, 255, cv2.THRESH_BINARY_INV)[1]
 
-  # Create custom kernel
-  kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-  # Perform closing (dilation followed by erosion)
-  close = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+  # # Create custom kernel
+  # kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+  # # Perform closing (dilation followed by erosion)
+  # close = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
 
-  # Invert image to use for Tesseract
-  image = 255 - close
+  # # Invert image to use for Tesseract
+  # image = 255 - close
 
   #image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
   #show the frame
