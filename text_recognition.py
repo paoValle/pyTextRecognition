@@ -11,6 +11,8 @@ import cv2
 import urllib
 import time
 
+targhette = ["HA690", "HA691", "HA692"]
+
 def decode_predictions(scores, geometry):
   # grab the number of rows and columns from the scores volume, then
   # initialize our set of bounding box rectangles and corresponding
@@ -182,9 +184,11 @@ while True:
     config = ("-l eng --oem 1 --psm 9")
     text = pytesseract.image_to_string(roi, config=config)
 
-    # add the bounding box coordinates and OCR'd text to the list
-    # of results
-    results.append(((startX, startY, endX, endY), text))
+    for t in targhette:
+      if (text.find(t) >=0):
+        # add the bounding box coordinates and OCR'd text to the list
+        # of results
+        results.append(((startX, startY, endX, endY), t))
 
   # sort the results bounding box coordinates from top to bottom
   #results = sorted(results, key=lambda r:r[0][1])
